@@ -1,0 +1,4 @@
+Backburner simulator
+Plugin type - Include original backburner, next include my BackburnerSim.
+Using Backburnersim do same procedure as on Backburner.
+This will create simulation of whatever procedures you define.
