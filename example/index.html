@@ -1,0 +1,79 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<div id='container'></div>
+
+		<table id='myTable'>
+
+		</table>
+		<script src='backburner.js-0.1.0.js'>
+		</script>
+		<script src='../lib/backBurnerSim.js'>
+		</script>
+		<script type='text/javascript'>
+			var queuenames = ['first', 'second'];
+			var options = {'element': 'container'};
+			var backburnerSim = new BackburnerSim(queuenames, options);
+			var func = function(){
+				//alert('me');
+			}
+			backburnerSim.run(null, function(){
+				backburnerSim.scheduleOnce('second', func);
+				backburnerSim.schedule('first', func);				
+				backburnerSim.scheduleOnce('second', func);
+				backburnerSim.schedule('first', function(){
+					backburnerSim.scheduleOnce('second', func);
+					backburnerSim.later(func, 100)
+				})
+			});
+
+			var tabler = document.getElementById('myTable');
+			var i = 0;
+			var start = +new Date();
+			console.log('start - ', start);			
+			for(;i< 200000; i++){
+				var frag = document.createDocumentFragment();
+				var tr  = document.createElement('tr');
+				frag.appendChild(tr);
+				var j =0;
+				for(;j< 10;j++){
+					var td = document.createElement('td');
+					tr.appendChild(td);
+					td.innerHTML = 'No = '+ i + ' ' + j;
+				}
+				tabler.appendChild(frag);
+			}
+
+			var mid = +new Date();
+			console.log('mid - ', mid);
+			console.log('midDiff - ', mid-start);
+			tabler.innerHTML = "";
+			i=0;
+			backburnerSim.backburner.run(function(){
+				for(;i< 200000; i++){
+					var frag = document.createDocumentFragment();
+					var tr  = document.createElement('tr');
+					frag.appendChild(tr);
+					var j =0;
+					for(;j< 10;j++){
+						var td = document.createElement('td');
+						tr.appendChild(td);
+						td.innerHTML = 'No = '+ i + ' ' + j;
+					}
+					appendToChild(frag);				
+				};
+			});
+
+			function appendToChild(frag){
+				backburnerSim.backburner.schedule('first', function(){
+					tabler.appendChild(frag);
+				});
+			}
+			var end = +new Date();
+			console.log('end - ',end)
+			var diff = end - mid;
+			console.log('diff - ', diff);
+		</script>
+	</body>
+</html>
